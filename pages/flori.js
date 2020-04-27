@@ -1,15 +1,17 @@
 import Head from 'next/head'
+import { returnData } from '../lib/prueba';
 
-const Flori = () => (
-  <div className="container">
-    <h1>Hola</h1>
+export async function getStaticProps() {
+  const allPostsData = returnData();
+  return {
+    props: {
+      allPostsData
+    }
+  }
+}
 
-    <style jsx>{`
-      h1 {
-        color: red;
-      }
-    `}</style>
-  </div>
-)
-
-export default Flori
+export default function Flori({ allPostsData }) {
+  return (
+    <h1>hey {allPostsData}</h1>
+  )
+};

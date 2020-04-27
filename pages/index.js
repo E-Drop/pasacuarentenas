@@ -1,4 +1,7 @@
 import Head from 'next/head'
+import Link from 'next/link'
+import Router from 'next/router'
+
 
 const Home = () => (
   <div className="container">
