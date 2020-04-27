@@ -5,8 +5,17 @@ import EmptyPlace from './EmptyPlace';
 export default class CrossWordsComponent extends React.Component{
   constructor(props) {
     super(props);
+    const temporal = this.props.completed.map((arr) => arr.map(t => ({...t})));
+    temporal.map(i =>
+      i.map( t => {
+        if(t.value) {
+          t.value = '';
+        }
+        return t;
+      })
+    );
     this.state= {
-      temp: this.props.completed.forEach( i => { return i.value ? i.value = '' : i }),
+      temp: temporal,
       check: false,
       gameOver: false,
       finalResult: false,
@@ -15,7 +24,8 @@ export default class CrossWordsComponent extends React.Component{
   
   onChangeValue =(row, col, event) => {
     let newArr = [...this.state.temp];
-    newArr[row][col] = event.target.value;
+    newArr[row][col].value = event.target.value;
+    console.log(newArr[row][col].value);
     this.setState({
       temp: newArr,
       check: false,
@@ -39,15 +49,14 @@ export default class CrossWordsComponent extends React.Component{
   }
 
   render() {
-    const {gameOver, finalResult} = this.state;
-    const {completed} = this.props;
+    const {gameOver, finalResult, temp} = this.state;
     return (
       <div className="container">
         <div className="sudoku">
-          {completed.map((item, row) =>
+          {temp.map((item, row) =>
             <div className="line">
-            {item.map((letter, col) =>
-              letter.value ? letter.number ? <LetterBox col={col} row={row} num={letter.number} /> : <LetterBox col={col} row={row} /> : <EmptyPlace/>
+            {item.map((letter, col) => 
+              letter.value !== undefined ? letter.number ? <LetterBox col={col} onChangeValue={this.onChangeValue} row={row} num={letter.number} char={letter.value} /> : <LetterBox  onChangeValue={this.onChangeValue} col={col} row={row} char={letter.value} /> : <EmptyPlace/>
             )}
             </div>
           )}

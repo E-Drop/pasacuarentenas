@@ -1,7 +1,7 @@
-const LetterBox = ({row, col, num}) => {
+const LetterBox = ({row, col, num, char, onChangeValue}) => {
   return (
     <div className='char'>
-    <input type="text" id="tentacles" name="tentacles"/>
+    <input type="text" id="tentacles" name="tentacles" onChange={(e)=> {onChangeValue(row, col, e)}} value={char}/>
     { num && <p className="number">{num}</p>}
       <style jsx>{`
       .char {
@@ -13,12 +13,6 @@ const LetterBox = ({row, col, num}) => {
         align-items: center;
         position: relative;
         padding-bottom: .5vw;
-      }
-      .row3 {
-        border-bottom: 3px solid black !important;
-      }
-      .col3 {
-        border-right: 3px solid black !important;
       }
       input {
         width: 80%;
