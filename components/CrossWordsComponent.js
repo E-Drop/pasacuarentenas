@@ -5,17 +5,8 @@ import EmptyPlace from './EmptyPlace';
 export default class CrossWordsComponent extends React.Component{
   constructor(props) {
     super(props);
-    const temporal = this.props.completed.map((arr) => arr.map(t => ({...t})));
-    temporal.map(i =>
-      i.map( t => {
-        if(t.value) {
-          t.value = '';
-        }
-        return t;
-      })
-    );
     this.state= {
-      temp: temporal,
+      temp: this.props.completed.map((arr) => arr.map(t => (t.value !== undefined ? {...t, value: ''} : {}))),
       check: false,
       gameOver: false,
       finalResult: false,
@@ -37,8 +28,8 @@ export default class CrossWordsComponent extends React.Component{
     let gameOver = true;
     for(var row = 0; row < 13; row++){
       for(var col = 0; col < 13; col++){
-        gameOver = gameOver ? this.state.temp[row][col] === '' ? false : true : false;
-        finalResult = finalResult ? this.state.temp [row][col] === completed[row][col] ? true : false : false;
+        gameOver = gameOver && this.state.temp[row][col].value ? this.state.temp[row][col].value === '' ? false : true : false;
+        finalResult = finalResult ? this.state.temp[row][col].value === this.props.completed[row][col].value ? true : false : false;
       }
     };
     this.setState({
@@ -49,19 +40,22 @@ export default class CrossWordsComponent extends React.Component{
   }
 
   render() {
-    const {gameOver, finalResult, temp} = this.state;
+    const {gameOver, finalResult, temp, check} = this.state;
+    const {completed} = this.props;
     return (
       <div className="container">
         <div className="sudoku">
           {temp.map((item, row) =>
             <div className="line">
             {item.map((letter, col) => 
-              letter.value !== undefined ? letter.number ? <LetterBox col={col} onChangeValue={this.onChangeValue} row={row} num={letter.number} char={letter.value} /> : <LetterBox  onChangeValue={this.onChangeValue} col={col} row={row} char={letter.value} /> : <EmptyPlace/>
+              letter.value !== undefined ? letter.number ? 
+              <LetterBox col={col} onChangeValue={this.onChangeValue} checking={check} row={row} num={letter.number} char={letter.value} correctChar={completed[row][col].value} /> 
+              : <LetterBox  onChangeValue={this.onChangeValue} checking={check} col={col} row={row} char={letter.value} correctChar={completed[row][col].value} /> : <EmptyPlace/>
             )}
             </div>
           )}
         </div>
-        <button onClick={this.checkSudoku}>Comprobar</button>
+        <button onClick={this.checkGame}>Comprobar</button>
         <p>{gameOver && 'Juego Finalizado'}{gameOver ? finalResult ? 'Has Ganado' : 'Tienes errores pringao' : ''}</p>
         <style jsx>{`
           .sudoku {

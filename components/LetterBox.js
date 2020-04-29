@@ -1,7 +1,9 @@
-const LetterBox = ({row, col, num, char, onChangeValue}) => {
+const LetterBox = ({row, col, num, char, onChangeValue, checking, correctChar}) => {
+  const classChar = checking ? correctChar !== char ? 'wrong' : 'correct': '';
+
   return (
     <div className='char'>
-    <input type="text" id="tentacles" name="tentacles" onChange={(e)=> {onChangeValue(row, col, e)}} value={char}/>
+    <input className={classChar} type="text" id="tentacles" name="tentacles" onChange={(e)=> {onChangeValue(row, col, e)}} value={char}/>
     { num && <p className="number">{num}</p>}
       <style jsx>{`
       .char {
