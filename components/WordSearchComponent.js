@@ -25,30 +25,45 @@ export default class WordSearchComponent extends React.Component{
     
   }
 
+  outOfBounds = (x, y, long, direction) => {
+    return ((x + (long * direction.x)) >= 0 && y + (long * direction.y) >= 0 && x + (long * direction.x) < 30 && y + (long * direction.y) < 30) ? false : true;
+  }
+
   floriponcia = ( word ) => {
-    const places = [{x:-1,y:0},{x:1,y:0},{x:0,y:-1},{x:0,y:1},{x:-1,y:-1},{x:1,y:1},{x:1,y:-1},{x:-1,y:1}];
+    const directions = [{x:-1,y:0},{x:1,y:0},{x:0,y:-1},{x:0,y:1},{x:-1,y:-1},{x:1,y:1},{x:1,y:-1},{x:-1,y:1}];
+    const long = word.length;
+    let pos = [...Array(long)];
+    let find = false;
+
     this.state.temp.map((row, y) => {
       row.map((col, x) => {
-        console.log('asdasd ',col.value);
-        if (col.value === word.substring(0, 1)){
-          places.map(func => {
-            const k = word.length - 1;
-            if (k * func.x >= 0 && k * func.y >= 0 && k * func.x < 29 && k * func.y < 29) {
-              var find = true;
-              for(var i = 1; i < word.length ; i++) {
-                console.log(y + (i *func.y),x + (i *func.x));
-                find = word.substring(i,1) === this.state.temp[y + (i *func.y)][x + (i *func.x)];
+        if (col.value === word[0]){
+          directions.map(direction => {
+            if (!find && !this.outOfBounds(x,y,long -1, direction)) {
+              for(var i = 1; i <= long ; i++) {
+                console.log('aqui',word.substring(i - 1, i), i);
+                find = word.substring(i - 1, i) === this.state.temp[y + (i * direction.y)][x + (i * direction.x)].value;
+                pos[i -1] = {x: x + (i * direction.x), y: y + (i * direction.y)};
                 if (!find) break;
               };
-              if (find) {
-                return true;
-              }
             }
           });
         }
       });
     });
-    return false;
+
+    if (find) {
+      pos.map(o =>{
+        let newArr = [...this.state.temp];
+        newArr[o.y][o.x].correct = 1;
+        this.setState({
+          temp: newArr,
+          check: false,
+        });
+      });
+    } else {
+      console.log('not find the word');
+    }
   };
 
   render(){
