@@ -9,6 +9,7 @@ export default class WordSearchComponent extends React.Component{
       check: false,
       gameOver: false,
       finalResult: false,
+      word: '',
     };
   }
   
@@ -20,50 +21,52 @@ export default class WordSearchComponent extends React.Component{
       check: false,
     });
   }
-  
-  checkGame = () => {
-    
+
+  onChangeValue = (e) => {
+    const word = e.target.value.toUpperCase();
+    this.setState({
+      word: word,
+    })
   }
 
   outOfBounds = (x, y, long, direction) => {
     return ((x + (long * direction.x)) >= 0 && y + (long * direction.y) >= 0 && x + (long * direction.x) < 30 && y + (long * direction.y) < 30) ? false : true;
   }
 
-  floriponcia = ( word ) => {
+  floriponcia = () => {
+    const { word } = this.state;
     const directions = [{x:-1,y:0},{x:1,y:0},{x:0,y:-1},{x:0,y:1},{x:-1,y:-1},{x:1,y:1},{x:1,y:-1},{x:-1,y:1}];
-    const long = word.length;
+    const long = word.length - 1;
     let pos = [...Array(long)];
-    let find = false;
-
+  
     this.state.temp.map((row, y) => {
       row.map((col, x) => {
-        if (col.value === word[0]){
+        if (col.value === word[0]) {
           directions.map(direction => {
-            if (!find && !this.outOfBounds(x,y,long -1, direction)) {
-              for(var i = 1; i <= long ; i++) {
-                console.log('aqui',word.substring(i - 1, i), i);
-                find = word.substring(i - 1, i) === this.state.temp[y + (i * direction.y)][x + (i * direction.x)].value;
-                pos[i -1] = {x: x + (i * direction.x), y: y + (i * direction.y)};
+            let find = false;
+            if (!this.outOfBounds(x,y,long, direction)) {
+              for(var i = 0; i < word.length; i++) {
+                find = word.substring(i, i + 1) === this.state.temp[y + (i * direction.y)][x + (i * direction.x)].value;
+                pos[i] = {x: x + (i * direction.x), y: y + (i * direction.y)};
                 if (!find) break;
               };
+              if (find) {
+                let newArr = [...this.state.temp];
+                pos.map(o => {
+                  newArr[o.y][o.x].correct = 1;
+                });
+                this.setState({
+                  temp: newArr,
+                });
+                return true;
+              }
             }
           });
         }
       });
     });
-
-    if (find) {
-      pos.map(o =>{
-        let newArr = [...this.state.temp];
-        newArr[o.y][o.x].correct = 1;
-        this.setState({
-          temp: newArr,
-          check: false,
-        });
-      });
-    } else {
-      console.log('not find the word');
-    }
+    console.log('not find the word');
+    return false;
   };
 
   render(){
@@ -73,14 +76,14 @@ export default class WordSearchComponent extends React.Component{
         <div className="sudoku">
           {temp.map((item, row) =>
             <div className="line">
-            {item.map((letter, col) =>
+            {item.map((letter) =>
              <LetterPlace letter={letter} />
             )}
             </div>
           )}
         </div>
-        <button onClick={()=>{this.floriponcia('ACTUALMENTE')}}>Comprobar</button>
-        <p>{gameOver && 'Juego Finalizado'}{gameOver && finalResult ? 'Has Ganado' : 'Tienes errores pringao'}</p>
+        <input type="text" name="fname" onChange={(e)=> {this.onChangeValue(e)}}/>  
+        <button onClick={this.floriponcia}>Comprobar</button>
         <style jsx>{`
           .line{
             display: flex;
